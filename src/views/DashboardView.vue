@@ -5,20 +5,30 @@
 
     <!-- 중앙 성과/결함률 섹션 -->
     <div class="center-section">
-      <PerformanceCharts />
+      <PerformanceCharts
+        :achievement-data="dashboardData?.performance?.achievement || {}"
+        :defect-data="dashboardData?.performance?.defect || {}"
+      />
     </div>
 
     <!-- 우측 테이블 섹션 -->
     <div class="right-section">
-      <DataTable />
+      <DataTable
+        :total-production="dashboardData?.production?.totalProduction || 0"
+        :row2-data="dashboardData?.production?.lineProduction || []"
+        :row3-data="dashboardData?.production?.qualityData || []"
+        :row4-data="dashboardData?.production?.operationData || []"
+        :row5-data="dashboardData?.production?.resourceData || []"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import SideMenu from '@/components/SideMenu.vue'
-import PerformanceCharts from '@/components/PerformanceCharts.vue'
-import DataTable from '@/components/DataTable.vue'
+import SideMenu from '@/components/dashboard/SideMenu.vue'
+import PerformanceCharts from '@/components/dashboard/PerformanceCharts.vue'
+import DataTable from '@/components/dashboard/DataTable.vue'
+import { useDashboard } from '@/composables/useDashboard.js'
 
 export default {
   name: 'DashboardView',
@@ -26,6 +36,11 @@ export default {
     SideMenu,
     PerformanceCharts,
     DataTable,
+  },
+  setup() {
+    // 현재는 간단하게 대시보드 데이터만 사용
+    const { dashboardData } = useDashboard()
+    return { dashboardData }
   },
 }
 </script>
