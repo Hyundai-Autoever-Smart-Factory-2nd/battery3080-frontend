@@ -5,12 +5,9 @@
       <h3>오늘의 달성률</h3>
       <div class="chart-container">
         <div class="circular-chart">
-          <div
-            class="circle-progress achievement"
-            :style="{ '--progress': achievementData.percentage }"
-          >
+          <div class="circle-progress achievement" :style="{ '--progress': achievementPercentage }">
             <div class="chart-center-text">
-              <div class="percentage">{{ achievementData.percentage }}%</div>
+              <div class="percentage">{{ achievementPercentage }}%</div>
               <div class="label">달성률</div>
             </div>
           </div>
@@ -18,11 +15,11 @@
       </div>
       <div class="stats">
         <div class="stat-item">
-          <span class="label">목표 수량:</span>
+          <span class="label">목표 수량</span>
           <span class="value">{{ achievementData.target.toLocaleString() }}</span>
         </div>
         <div class="stat-item">
-          <span class="label">달성 수량:</span>
+          <span class="label">달성 수량</span>
           <span class="value">{{ achievementData.achieved.toLocaleString() }}</span>
         </div>
       </div>
@@ -33,9 +30,9 @@
       <h3>오늘의 결함률</h3>
       <div class="chart-container">
         <div class="circular-chart">
-          <div class="circle-progress defect" :style="{ '--progress': defectData.percentage }">
+          <div class="circle-progress defect" :style="{ '--progress': defectPercentage }">
             <div class="chart-center-text">
-              <div class="percentage">{{ defectData.percentage }}%</div>
+              <div class="percentage">{{ defectPercentage }}%</div>
               <div class="label">결함률</div>
             </div>
           </div>
@@ -43,11 +40,11 @@
       </div>
       <div class="stats">
         <div class="stat-item">
-          <span class="label">생산 수량:</span>
+          <span class="label">생산 수량</span>
           <span class="value">{{ defectData.production.toLocaleString() }}</span>
         </div>
         <div class="stat-item">
-          <span class="label">결함 수량:</span>
+          <span class="label">결함 수량</span>
           <span class="value">{{ defectData.defective.toLocaleString() }}</span>
         </div>
       </div>
@@ -63,14 +60,26 @@ export default {
       achievementData: {
         target: 1000,
         achieved: 999,
-        percentage: 99.9,
       },
       defectData: {
         production: 2000,
         defective: 1000,
-        percentage: 50.0,
       },
     }
+  },
+  computed: {
+    // 달성률 퍼센티지 자동 계산
+    achievementPercentage() {
+      if (this.achievementData.target === 0) return 0
+      return (
+        Math.round((this.achievementData.achieved / this.achievementData.target) * 100 * 10) / 10
+      )
+    },
+    // 결함률 퍼센티지 자동 계산
+    defectPercentage() {
+      if (this.defectData.production === 0) return 0
+      return Math.round((this.defectData.defective / this.defectData.production) * 100 * 10) / 10
+    },
   },
 }
 </script>
@@ -219,14 +228,15 @@ export default {
 .stat-item .label {
   color: #6c757d;
   font-weight: 600;
+  margin-top: 2rem;
   margin-bottom: 6px;
   white-space: nowrap;
-  font-size: 0.95rem;
+  font-size: 1.95rem;
 }
 
 .stat-item .value {
   color: #2c3e50;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 </style>
