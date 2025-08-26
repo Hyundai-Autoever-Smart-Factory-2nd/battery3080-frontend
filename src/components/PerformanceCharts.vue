@@ -124,8 +124,8 @@ export default {
 }
 
 .circular-chart {
-  width: 220px;
-  height: 220px;
+  width: 280px;
+  height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,8 +133,8 @@ export default {
 
 .circle-progress {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -165,8 +165,8 @@ export default {
 .circle-progress::before {
   content: '';
   position: absolute;
-  width: 140px;
-  height: 140px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   background: white;
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -228,15 +228,14 @@ export default {
 .stat-item .label {
   color: #6c757d;
   font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 6px;
+  margin-bottom: 0.5rem;
   white-space: nowrap;
-  font-size: 1.95rem;
+  font-size: 2rem;
 }
 
 .stat-item .value {
   color: #2c3e50;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 }
 </style>
