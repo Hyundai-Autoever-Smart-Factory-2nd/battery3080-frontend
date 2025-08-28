@@ -2,7 +2,7 @@
   <div class="performance-charts">
     <!-- 달성률 섹션 -->
     <div class="chart-section">
-      <h3>오늘의 달성률</h3>
+      <h3>당일 달성률</h3>
       <div class="chart-container">
         <div class="circular-chart">
           <div class="circle-progress achievement" :style="{ '--progress': achievementPercentage }">
@@ -27,7 +27,7 @@
 
     <!-- 결함률 섹션 -->
     <div class="chart-section">
-      <h3>오늘의 결함률</h3>
+      <h3>당일 결함률</h3>
       <div class="chart-container">
         <div class="circular-chart">
           <div class="circle-progress defect" :style="{ '--progress': defectPercentage }">
