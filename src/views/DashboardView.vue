@@ -3,24 +3,38 @@
     <!-- 좌측 메뉴바 -->
     <SideMenu class="sidebar" />
 
-    <!-- 중앙 성과/결함률 섹션 -->
-    <div class="center-section">
-      <PerformanceCharts
-        :achievement-data="dashboardData?.performance?.achievement || {}"
-        :defect-data="dashboardData?.performance?.defect || {}"
-      />
+    <!-- 로딩 상태 -->
+    <div v-if="isLoading" class="loading-container">
+      <div class="loading-spinner">백엔드 서버에서 데이터를 불러오는 중...</div>
     </div>
 
-    <!-- 우측 테이블 섹션 -->
-    <div class="right-section">
-      <DataTable
-        :total-production="dashboardData?.production?.totalProduction || 0"
-        :row2-data="dashboardData?.production?.lineProduction || []"
-        :row3-data="dashboardData?.production?.qualityData || []"
-        :row4-data="dashboardData?.production?.operationData || []"
-        :row5-data="dashboardData?.production?.resourceData || []"
-      />
+    <!-- 에러 상태 -->
+    <div v-else-if="error" class="error-container">
+      <div class="error-message">{{ error }}</div>
+      <button @click="refreshData" class="retry-button">다시 시도</button>
     </div>
+
+    <!-- 대시보드 콘텐츠 -->
+    <template v-else>
+      <!-- 중앙 성과/결함률 섹션 -->
+      <div class="center-section">
+        <PerformanceCharts
+          :achievement-data="dashboardData?.performance?.achievement || {}"
+          :defect-data="dashboardData?.performance?.defect || {}"
+        />
+      </div>
+
+      <!-- 우측 테이블 섹션 -->
+      <div class="right-section">
+        <DataTable
+          :total-production="dashboardData?.production?.totalProduction || 0"
+          :row2-data="dashboardData?.production?.lineProduction || []"
+          :row3-data="dashboardData?.production?.qualityData || []"
+          :row4-data="dashboardData?.production?.operationData || []"
+          :row5-data="dashboardData?.production?.resourceData || []"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -38,9 +52,9 @@ export default {
     DataTable,
   },
   setup() {
-    // 현재는 간단하게 대시보드 데이터만 사용
-    const { dashboardData } = useDashboard()
-    return { dashboardData }
+    // API 연동으로 대시보드 데이터 관리
+    const { dashboardData, isLoading, error, refreshData } = useDashboard()
+    return { dashboardData, isLoading, error, refreshData }
   },
 }
 </script>
@@ -63,7 +77,7 @@ export default {
 }
 
 .center-section {
-  flex: 0 0 700px;
+  flex: 0.6;
   display: flex;
   flex-direction: column;
   padding: 15px;
@@ -79,5 +93,44 @@ export default {
   height: 100vh;
   box-sizing: border-box;
   min-width: 0;
+}
+
+/* 로딩/에러 상태 스타일 */
+.loading-container,
+.error-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.loading-spinner {
+  font-size: 1.2rem;
+  color: #3498db;
+  text-align: center;
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  padding: 12px 24px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #2980b9;
 }
 </style>
