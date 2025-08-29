@@ -16,6 +16,11 @@
       <!-- 공장 선택 -->
       <FactorySelector v-model:selectedFactory="selectedFactory" :factory-list="factoryList" />
 
+      <!-- 에러 메시지 표시 -->
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
+
       <!-- 상태별 장비 리스트 -->
       <div class="status-sections">
         <EquipmentStatusSection
@@ -23,6 +28,10 @@
           :equipment="goodEquipment"
           v-model:currentPage="goodCurrentPage"
           :items-per-page="itemsPerPage"
+          :total-pages="goodTotalPages"
+          :total-count="goodTotalCount"
+          :is-loading="isLoading"
+          :equipment-type="type"
           @equipment-select="goToDetail"
         />
         <EquipmentStatusSection
@@ -30,6 +39,10 @@
           :equipment="warningEquipment"
           v-model:currentPage="warningCurrentPage"
           :items-per-page="itemsPerPage"
+          :total-pages="warningTotalPages"
+          :total-count="warningTotalCount"
+          :is-loading="isLoading"
+          :equipment-type="type"
           @equipment-select="goToDetail"
         />
         <EquipmentStatusSection
@@ -37,6 +50,10 @@
           :equipment="dangerEquipment"
           v-model:currentPage="dangerCurrentPage"
           :items-per-page="itemsPerPage"
+          :total-pages="dangerTotalPages"
+          :total-count="dangerTotalCount"
+          :is-loading="isLoading"
+          :equipment-type="type"
           @equipment-select="goToDetail"
         />
       </div>
@@ -78,6 +95,7 @@ export default {
       updateRefreshInterval,
     } = useAutoRefresh(() => {
       console.log('장비 데이터 갱신 중...')
+      fetchAllEquipmentData() // API 기반 데이터 새로고침
     })
 
     // 장비 관리 관련
@@ -89,7 +107,16 @@ export default {
       goodEquipment,
       warningEquipment,
       dangerEquipment,
+      goodTotalPages,
+      warningTotalPages,
+      dangerTotalPages,
+      goodTotalCount,
+      warningTotalCount,
+      dangerTotalCount,
+      isLoading,
+      error,
       resetPages,
+      fetchAllEquipmentData,
     } = useEquipmentList(equipmentType, selectedFactory)
 
     // 공장 변경 시 페이지 리셋
@@ -135,6 +162,14 @@ export default {
       goodEquipment,
       warningEquipment,
       dangerEquipment,
+      goodTotalPages,
+      warningTotalPages,
+      dangerTotalPages,
+      goodTotalCount,
+      warningTotalCount,
+      dangerTotalCount,
+      isLoading,
+      error,
       goToDetail,
     }
   },
@@ -170,5 +205,15 @@ export default {
   gap: 10px;
   height: calc(100vh - 280px);
   padding: 0 10px;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px 16px;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin: 10px 0;
+  text-align: center;
 }
 </style>

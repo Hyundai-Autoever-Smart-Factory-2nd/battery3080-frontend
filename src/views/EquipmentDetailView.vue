@@ -4,7 +4,7 @@
     <div class="main-content">
       <!-- 상단 정보 영역 -->
       <InfoTopBar
-        :title="`${equipmentData.serialNumber} 상세 모니터링`"
+        :title="`${equipmentData.model_num || 'AGV-001'} 상세 모니터링`"
         :current-date-time="currentDateTime"
         :manager-name="managerName"
         :refresh-interval="refreshInterval"
@@ -22,11 +22,11 @@
       </div>
 
       <!-- 하단 섹션 (2개 차트) -->
-      <div class="bottom-section">
-        <OperationChart @chart-ready="createOperationChart" />
+      <div class="bottom-section" v-if="!isLoading && equipmentData.model_num">
+        <OperationChart @chart-ready="handleOperationChartReady" />
         <UtilizationCharts
-          @utilization-chart-ready="createUtilizationChart"
-          @efficiency-chart-ready="createEfficiencyChart"
+          @utilization-chart-ready="handleUtilizationChartReady"
+          @efficiency-chart-ready="handleEfficiencyChartReady"
         />
       </div>
     </div>
@@ -45,6 +45,8 @@ import UtilizationCharts from '@/components/equipmentDetail/UtilizationCharts.vu
 import { useCharts } from '@/composables/useCharts.js'
 import { useMap } from '@/composables/useMap.js'
 import { useAutoRefresh } from '@/composables/useAutoRefresh.js'
+import { useEquipmentDetail } from '@/composables/useEquipmentDetail.js'
+import { computed } from 'vue'
 
 export default {
   name: 'EquipmentDetailView',
@@ -58,12 +60,17 @@ export default {
     UtilizationCharts,
   },
   props: ['type', 'id'],
-  setup() {
+  setup(props) {
     const { createOperationChart, createUtilizationChart, createEfficiencyChart } = useCharts()
-
     const { initMap } = useMap()
-
     const { refreshInterval, isAutoRefresh, updateRefreshInterval } = useAutoRefresh()
+
+    // 장비 ID를 computed로 변환
+    const modelInfoId = computed(() => parseInt(props.id))
+
+    // 장비 상세 정보 로드
+    const { equipmentData, isLoading, error, fetchEquipmentDetail } =
+      useEquipmentDetail(modelInfoId)
 
     return {
       createOperationChart,
@@ -73,6 +80,10 @@ export default {
       refreshInterval,
       isAutoRefresh,
       updateRefreshInterval,
+      equipmentData,
+      isLoading,
+      error,
+      fetchEquipmentDetail,
     }
   },
   data() {
@@ -80,18 +91,6 @@ export default {
       currentDateTime: '',
       managerName: '홍길동',
       dateTimeTimer: null,
-      equipmentData: {
-        model: 'AGV-1',
-        serialNumber: 'AGV-001-2024',
-        battery: 85,
-        speed: 2.5,
-        totalDistance: 1247.8,
-        imageUrl: '/src/assets/logo.svg',
-        currentTask: '운반 작업',
-        origin: '창고 A',
-        destination: '라인 2',
-        eta: '3분 후 예정',
-      },
       notificationLogs: [
         { time: '14:32', message: '배터리 85% - 정상', type: 'info' },
         { time: '14:28', message: '적재 완료', type: 'success' },
@@ -103,7 +102,6 @@ export default {
     }
   },
   mounted() {
-    this.loadEquipmentData()
     this.updateDateTime()
 
     // 1초마다 시간 업데이트
@@ -117,49 +115,30 @@ export default {
     }
   },
   methods: {
-    loadEquipmentData() {
-      // 실제로는 API 호출로 데이터를 가져올 것
-      const mockData = {
-        agv: {
-          1: {
-            model: 'AGV-1',
-            battery: 85,
-            speed: 2.5,
-            totalDistance: 1247.8,
-            imageUrl: '/src/assets/logo.svg',
-            currentTask: '운반 작업',
-            origin: '창고 A',
-            destination: '라인 2',
-            eta: '3분 후 예정',
-          },
-          2: {
-            model: 'AGV-2',
-            battery: 62,
-            speed: 1.8,
-            totalDistance: 945.2,
-            imageUrl: '/src/assets/logo.svg',
-            currentTask: '적재 대기',
-            origin: '라인 1',
-            destination: '창고 B',
-            eta: '5분 후 예정',
-          },
-        },
-        forklift: {
-          1: {
-            model: 'F-10',
-            battery: null,
-            speed: 8.0,
-            totalDistance: 2156.4,
-            imageUrl: '/src/assets/logo.svg',
-            currentTask: '화물 운반',
-            origin: '적재장',
-            destination: '출하장',
-            eta: '2분 후 예정',
-          },
-        },
-      }
-
-      this.equipmentData = { ...this.equipmentData, ...mockData[this.type]?.[this.id] }
+    methods: {
+      updateDateTime() {
+        const now = new Date()
+        const options = {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        }
+        this.currentDateTime = now.toLocaleString('ko-KR', options)
+      },
+      goBack() {
+        this.$router.push({ name: 'equipment-list', params: { type: this.type } })
+      },
+      handleRefreshIntervalUpdate(value) {
+        console.log('갱신 간격 변경:', value)
+        this.updateRefreshInterval(value, () => {
+          // 장비 상세 데이터 새로고침
+          console.log('장비 상세 데이터 갱신 중...')
+        })
+      },
     },
     updateDateTime() {
       const now = new Date()
@@ -177,33 +156,64 @@ export default {
     goBack() {
       this.$router.push({ name: 'equipment-list', params: { type: this.type } })
     },
+    handleOperationChartReady(canvas) {
+      // 데이터가 로드된 후에 차트 생성
+      if (this.equipmentData.temp && this.equipmentData.temp.length > 0) {
+        console.log('온도 차트 생성:', this.equipmentData.temp)
+        this.createOperationChart(canvas, this.equipmentData.temp)
+      }
+    },
+    handleUtilizationChartReady(canvas) {
+      // 데이터가 로드된 후에 차트 생성
+      if (this.equipmentData.run_count !== undefined) {
+        console.log('가동률 차트 생성:', {
+          run: this.equipmentData.run_count,
+          wait: this.equipmentData.wait_count,
+          charge: this.equipmentData.charge_count,
+          cooling: this.equipmentData.cooling_count,
+        })
+        this.createUtilizationChart(canvas, this.equipmentData)
+      }
+    },
+    handleEfficiencyChartReady(canvas) {
+      // 데이터가 로드된 후에 차트 생성
+      if (this.equipmentData.battery !== undefined) {
+        console.log('배터리 차트 생성:', this.equipmentData.battery)
+        this.createEfficiencyChart(canvas, this.equipmentData)
+      }
+    },
     handleRefreshIntervalUpdate(value) {
-      this.refreshInterval = parseInt(value)
-      this.updateRefreshInterval(() => {
-        this.fetchEquipmentData()
+      console.log('갱신 간격 변경:', value)
+      this.updateRefreshInterval(value, () => {
+        console.log('장비 상세 데이터 자동 갱신 실행')
+        this.fetchEquipmentDetail()
+
+        // 데이터 갱신 후 차트 업데이트
+        this.$nextTick(() => {
+          this.updateChartsWithNewData()
+        })
       })
     },
-    fetchEquipmentData() {
-      console.log('장비 상세 데이터 갱신 중...')
-
-      // 데이터만 업데이트 (차트 재생성하지 않음)
-      const mockData = {
-        agv: {
-          1: {
-            battery: Math.floor(Math.random() * 40) + 60, // 60-100 사이 랜덤
-            speed: (Math.random() * 2 + 1.5).toFixed(1), // 1.5-3.5 사이 랜덤
-          },
-        },
-        forklift: {
-          1: {
-            speed: (Math.random() * 4 + 6).toFixed(1), // 6-10 사이 랜덤
-          },
-        },
+    updateChartsWithNewData() {
+      // 온도 차트 업데이트
+      const operationCanvas = document.getElementById('operationChart')
+      if (operationCanvas && this.equipmentData.temp) {
+        console.log('온도 차트 업데이트:', this.equipmentData.temp)
+        this.createOperationChart(operationCanvas, this.equipmentData.temp)
       }
 
-      // 기존 데이터에 새로운 값만 업데이트
-      if (mockData[this.type]?.[this.id]) {
-        Object.assign(this.equipmentData, mockData[this.type][this.id])
+      // 가동률 차트 업데이트
+      const utilizationCanvas = document.getElementById('utilizationChart')
+      if (utilizationCanvas && this.equipmentData.run_count !== undefined) {
+        console.log('가동률 차트 업데이트:', this.equipmentData)
+        this.createUtilizationChart(utilizationCanvas, this.equipmentData)
+      }
+
+      // 배터리 차트 업데이트
+      const efficiencyCanvas = document.getElementById('efficiencyChart')
+      if (efficiencyCanvas && this.equipmentData.battery !== undefined) {
+        console.log('배터리 차트 업데이트:', this.equipmentData.battery)
+        this.createEfficiencyChart(efficiencyCanvas, this.equipmentData)
       }
     },
   },
