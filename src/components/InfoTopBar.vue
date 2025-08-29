@@ -17,11 +17,11 @@
             class="refresh-select"
           >
             <option value="0">수동</option>
-            <option value="1000">1초</option>
-            <option value="5000">5초</option>
-            <option value="30000">30초</option>
-            <option value="60000">1분</option>
-            <option value="300000">5분</option>
+            <option value="1">1초</option>
+            <option value="5">5초</option>
+            <option value="30">30초</option>
+            <option value="60">1분</option>
+            <option value="300">5분</option>
           </select>
           <span class="status-indicator" :class="{ active: isAutoRefresh }">
             {{ isAutoRefresh ? '자동 갱신 중' : '수동 모드' }}

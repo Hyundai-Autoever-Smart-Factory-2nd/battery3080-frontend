@@ -1,33 +1,44 @@
 <template>
   <div class="equipment-info-card">
-    <h3>장비 정보</h3>
+    <h3>{{ LABELS.equipment_info }}</h3>
     <div class="equipment-details">
-      <div class="detail-row">
-        <span class="label">모델 번호:</span>
-        <span class="value">{{ equipmentData.serialNumber }}</span>
+      <div class="info-grid">
+        <div class="detail-row">
+          <span class="label">{{ LABELS.model_num }}:</span>
+          <span class="value">{{ equipmentData.model_num || equipmentData.serialNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">{{ LABELS.cycle }}:</span>
+          <span class="value">{{ formatCycle(equipmentData.cycle) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">{{ LABELS.distance }}:</span>
+          <span class="value">{{ formatDistance(equipmentData.distance) }}</span>
+        </div>
       </div>
-      <div class="detail-row">
-        <span class="label">배터리:</span>
-        <span class="value battery" :class="getBatteryClass(equipmentData.battery)">
-          {{ equipmentData.battery }}%
-        </span>
-      </div>
-      <div class="detail-row">
-        <span class="label">속도:</span>
-        <span class="value">{{ equipmentData.speed }} km/h</span>
-      </div>
-      <div class="detail-row">
-        <span class="label">누적거리:</span>
-        <span class="value">{{ equipmentData.totalDistance }} km</span>
-      </div>
-      <div class="equipment-image">
-        <img :src="equipmentData.imageUrl" :alt="equipmentData.model" />
+
+      <!-- 배터리 잔량 원형 차트 -->
+      <div class="battery-section">
+        <div class="battery-circle">
+          <div class="circle-progress" :style="{ '--progress': batteryPercentage }">
+            <div class="circle-inner">
+              <span class="battery-value">{{ formatBattery(batteryLevel) }}</span>
+              <span class="battery-label">{{ LABELS.battery }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import {
+  EQUIPMENT_DETAIL_LABELS as LABELS,
+  formatDistance,
+  formatCycle,
+  formatBattery,
+} from '@/constants/equipmentDetailLabels.js'
+
 export default {
   name: 'EquipmentInfoCard',
   props: {
@@ -36,13 +47,23 @@ export default {
       required: true,
     },
   },
-  methods: {
-    getBatteryClass(battery) {
-      if (!battery) return ''
-      if (battery > 60) return 'battery-high'
-      if (battery > 30) return 'battery-medium'
-      return 'battery-low'
+  data() {
+    return {
+      LABELS,
+    }
+  },
+  computed: {
+    batteryLevel() {
+      return this.equipmentData.battery || 0
     },
+    batteryPercentage() {
+      return this.batteryLevel
+    },
+  },
+  methods: {
+    formatDistance,
+    formatCycle,
+    formatBattery,
   },
 }
 </script>
@@ -67,7 +88,13 @@ export default {
 .equipment-details {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .detail-row {
@@ -90,32 +117,57 @@ export default {
   text-align: right;
 }
 
-.battery.battery-high {
-  color: #27ae60;
-}
-
-.battery.battery-medium {
-  color: #f39c12;
-}
-
-.battery.battery-low {
-  color: #e74c3c;
-}
-
-.equipment-image {
+.battery-section {
   display: flex;
   justify-content: center;
-  margin-top: 15px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  align-items: center;
+  margin-top: 10px;
 }
 
-.equipment-image img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 8px;
-  border: 2px solid #ecf0f1;
+.battery-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.circle-progress {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #27ae60 0deg,
+    #27ae60 calc(var(--progress) * 3.6deg),
+    #ecf0f1 calc(var(--progress) * 3.6deg),
+    #ecf0f1 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.circle-inner {
+  width: 90px;
+  height: 90px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.battery-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.battery-label {
+  font-size: 0.7rem;
+  color: #7f8c8d;
+  font-weight: 500;
 }
 </style>
