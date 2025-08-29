@@ -1,6 +1,6 @@
 <template>
   <div class="notification-log-card">
-    <h3>알림 로그</h3>
+    <h3>{{ LABELS.notification_log }}</h3>
     <div class="log-container">
       <div v-for="(log, index) in notificationLogs" :key="index" class="log-item" :class="log.type">
         <div class="log-time">{{ log.time }}</div>
@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { EQUIPMENT_DETAIL_LABELS as LABELS } from '@/constants/equipmentDetailLabels.js'
+
 export default {
   name: 'NotificationLogCard',
   props: {
@@ -18,6 +20,11 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  data() {
+    return {
+      LABELS,
+    }
   },
 }
 </script>

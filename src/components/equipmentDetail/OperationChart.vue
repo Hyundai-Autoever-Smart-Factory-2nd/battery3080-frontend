@@ -1,6 +1,6 @@
 <template>
   <div class="chart-card">
-    <h3>운영 시간 추세</h3>
+    <h3>{{ LABELS.temperature_trend }}</h3>
     <div class="chart-container">
       <canvas ref="operationChart" id="operationChart"></canvas>
     </div>
@@ -8,8 +8,15 @@
 </template>
 
 <script>
+import { EQUIPMENT_DETAIL_LABELS as LABELS } from '@/constants/equipmentDetailLabels.js'
+
 export default {
   name: 'OperationChart',
+  data() {
+    return {
+      LABELS,
+    }
+  },
   mounted() {
     this.$emit('chart-ready', this.$refs.operationChart)
   },

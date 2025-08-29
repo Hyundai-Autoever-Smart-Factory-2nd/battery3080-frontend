@@ -1,26 +1,61 @@
 <template>
   <div class="movement-info-card">
-    <h3>현재 작업 상태</h3>
+    <h3>{{ LABELS.current_status }}</h3>
     <div class="current-task">
-      <div class="task-status">{{ equipmentData.currentTask }}</div>
-      <div class="route-info">
-        <div class="route">{{ equipmentData.origin }} → {{ equipmentData.destination }}</div>
-        <div class="eta">ETA: {{ equipmentData.eta }}</div>
+      <div class="status-info">
+        <div class="status-row">
+          <span class="label">{{ LABELS.status }}:</span>
+          <span class="value status-badge" :class="getStatusClass(equipmentData.status)">
+            {{ equipmentData.status || equipmentData.currentTask }}
+          </span>
+        </div>
+        <div class="status-row">
+          <span class="label">{{ LABELS.from_location }}:</span>
+          <span class="value">{{ equipmentData.from_location || equipmentData.origin }}</span>
+        </div>
+        <div class="status-row">
+          <span class="label">{{ LABELS.to_location }}:</span>
+          <span class="value">{{ equipmentData.to_location || equipmentData.destination }}</span>
+        </div>
       </div>
+
       <div class="map-container">
         <div id="equipment-map" class="map-element"></div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import { EQUIPMENT_DETAIL_LABELS as LABELS } from '@/constants/equipmentDetailLabels.js'
+
 export default {
   name: 'MovementInfoCard',
   props: {
     equipmentData: {
       type: Object,
       required: true,
+    },
+  },
+  data() {
+    return {
+      LABELS,
+    }
+  },
+  methods: {
+    getStatusClass(status) {
+      const statusMap = {
+        Driving: 'status-running',
+        운행중: 'status-running',
+        대기중: 'status-waiting',
+        충전중: 'status-charging',
+        점검필요: 'status-warning',
+        긴급정지: 'status-danger',
+        Waiting: 'status-waiting',
+        Charging: 'status-charging',
+        Loading: 'status-warning',
+        Cooling: 'status-waiting',
+      }
+      return statusMap[status] || 'status-default'
     },
   },
   mounted() {
@@ -58,34 +93,72 @@ export default {
   overflow-y: auto;
 }
 
-.task-status {
-  background: #d5f4e6;
-  color: #27ae60;
-  padding: 10px 15px;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-.route-info {
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   background: #f8f9fa;
   padding: 15px;
   border-radius: 8px;
 }
 
-.route {
-  color: #2c3e50;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 8px;
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
 }
 
-.eta {
+.status-row .label {
   color: #7f8c8d;
-  text-align: center;
-  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.status-row .value {
+  color: #2c3e50;
+  font-weight: 600;
+  flex: 1;
+  text-align: right;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.status-running {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.status-waiting {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-charging {
+  background: #cce5ff;
+  color: #0066cc;
+}
+
+.status-warning {
+  background: #fef9e7;
+  color: #f39c12;
+}
+
+.status-danger {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.status-default {
+  background: #e9ecef;
+  color: #6c757d;
 }
 
 .map-container {

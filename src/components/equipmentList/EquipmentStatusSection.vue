@@ -1,17 +1,28 @@
 <template>
   <div class="status-section" :class="status">
     <div class="status-header">
-      <h3>{{ statusLabel }} : {{ equipment.length }}개</h3>
+      <h3>
+        {{ statusLabel }} : <span class="count">{{ totalCount || equipment.length }}</span
+        >개
+      </h3>
     </div>
     <div class="equipment-grid">
+      <div v-if="isLoading" class="loading-message">데이터를 불러오는 중...</div>
+      <div v-else-if="equipment.length === 0" class="empty-message">장비가 없습니다</div>
       <EquipmentCard
-        v-for="item in paginatedEquipment"
+        v-else
+        v-for="item in equipment"
         :key="`${status}-${item.id}`"
         :equipment="item"
+        :equipment-type="equipmentType"
         @select="$emit('equipment-select', $event)"
       />
     </div>
-    <Pagination v-model:currentPage="currentPageInternal" :totalPages="totalPages" />
+    <Pagination
+      v-if="!isLoading && equipment.length > 0"
+      v-model:currentPage="currentPageInternal"
+      :totalPages="totalPages"
+    />
   </div>
 </template>
 
@@ -42,6 +53,22 @@ export default {
       type: Number,
       default: 6,
     },
+    totalPages: {
+      type: Number,
+      default: 1,
+    },
+    totalCount: {
+      type: Number,
+      default: 0,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    equipmentType: {
+      type: String,
+      default: 'agv',
+    },
   },
   emits: ['equipment-select', 'update:currentPage'],
   computed: {
@@ -52,14 +79,6 @@ export default {
         danger: '경고',
       }
       return statusMap[this.status] || this.status
-    },
-    paginatedEquipment() {
-      const start = (this.currentPage - 1) * this.itemsPerPage
-      const end = start + this.itemsPerPage
-      return this.equipment.slice(start, end)
-    },
-    totalPages() {
-      return Math.ceil(this.equipment.length / this.itemsPerPage)
     },
     currentPageInternal: {
       get() {
@@ -89,12 +108,24 @@ export default {
   border-left: 5px solid #27ae60;
 }
 
+.status-section.good .status-header h3 {
+  color: #27ae60;
+}
+
 .status-section.warning {
   border-left: 5px solid #f39c12;
 }
 
+.status-section.warning .status-header h3 {
+  color: #f39c12;
+}
+
 .status-section.danger {
   border-left: 5px solid #e74c3c;
+}
+
+.status-section.danger .status-header h3 {
+  color: #e74c3c;
 }
 
 .status-header {
@@ -107,8 +138,21 @@ export default {
 
 .status-header h3 {
   color: #2c3e50;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   margin: 0;
+  font-weight: 700;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.status-header h3 .count {
+  font-size: 1.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 4px;
 }
 
 .equipment-grid {
@@ -118,5 +162,18 @@ export default {
   padding: 0;
   flex: 1;
   overflow-y: auto;
+}
+
+.loading-message,
+.empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.loading-message {
+  color: #3498db;
 }
 </style>

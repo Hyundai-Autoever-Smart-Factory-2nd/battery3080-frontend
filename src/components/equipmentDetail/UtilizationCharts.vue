@@ -1,15 +1,15 @@
 <template>
   <div class="chart-card">
-    <h3>작업 가동률</h3>
+    <h3>{{ LABELS.daily_utilization }}</h3>
     <div class="utilization-charts">
       <div class="chart-item">
-        <h4>전체 가동률</h4>
+        <h4>금일 가동률</h4>
         <div class="chart-container">
           <canvas ref="utilizationChart" id="utilizationChart"></canvas>
         </div>
       </div>
       <div class="chart-item">
-        <h4>작업 효율성</h4>
+        <h4>충전 점유율</h4>
         <div class="chart-container">
           <canvas ref="efficiencyChart" id="efficiencyChart"></canvas>
         </div>
@@ -19,8 +19,15 @@
 </template>
 
 <script>
+import { EQUIPMENT_DETAIL_LABELS as LABELS } from '@/constants/equipmentDetailLabels.js'
+
 export default {
   name: 'UtilizationCharts',
+  data() {
+    return {
+      LABELS,
+    }
+  },
   mounted() {
     this.$emit('utilization-chart-ready', this.$refs.utilizationChart)
     this.$emit('efficiency-chart-ready', this.$refs.efficiencyChart)
@@ -70,13 +77,13 @@ export default {
 .chart-item .chart-container {
   flex: 1;
   width: 100%;
-  height: 180px;
-  min-height: 180px;
-  max-height: 180px;
+  height: 140px;
+  min-height: 140px;
+  max-height: 140px;
 }
 
 .chart-item .chart-container canvas {
   width: 100% !important;
-  height: 180px !important;
+  height: 140px !important;
 }
 </style>
