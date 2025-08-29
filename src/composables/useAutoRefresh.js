@@ -1,7 +1,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useAutoRefresh(callback) {
-  const refreshInterval = ref(30000) // 기본값 30초 (드롭다운으로 변경 가능)
+  const refreshInterval = ref(30) // 기본값 30초 (화면 표시용 - 초 단위)
   const isAutoRefresh = ref(true)
   const refreshTimer = ref(null)
 
@@ -29,9 +29,11 @@ export function useAutoRefresh(callback) {
     stopAutoRefresh()
     if (refreshInterval.value > 0) {
       isAutoRefresh.value = true
+      const intervalMs = refreshInterval.value * 1000 // 초를 밀리초로 변환
       refreshTimer.value = setInterval(() => {
         callback && callback()
-      }, refreshInterval.value)
+      }, intervalMs)
+      console.log(`자동 갱신 시작: ${refreshInterval.value}초 간격`)
     } else {
       isAutoRefresh.value = false
     }
@@ -45,8 +47,24 @@ export function useAutoRefresh(callback) {
     isAutoRefresh.value = false
   }
 
-  const updateRefreshInterval = (interval) => {
-    refreshInterval.value = interval
+  const updateRefreshInterval = (interval, newCallback = null) => {
+    console.log('updateRefreshInterval 호출:', interval, typeof interval)
+
+    // 숫자로 변환
+    const numInterval = typeof interval === 'number' ? interval : parseInt(interval)
+
+    if (isNaN(numInterval)) {
+      console.error('유효하지 않은 간격:', interval)
+      return
+    }
+
+    refreshInterval.value = numInterval // 초 단위로 저장
+
+    // 새로운 콜백이 제공되면 업데이트
+    if (newCallback) {
+      callback = newCallback
+    }
+
     startAutoRefresh()
   }
 
