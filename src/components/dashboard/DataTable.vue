@@ -4,7 +4,7 @@
 
     <div class="table-row row-1">
       <div class="cell full-width">
-        <div class="cell-header">배터리 경고</div>
+        <div class="cell-header">전체 배터리 경고 수</div>
         <div class="cell-content">
           <span class="number">{{ totalProduction.toLocaleString() }}</span>
         </div>
@@ -34,8 +34,7 @@
       <div class="cell" v-for="item in row4Data" :key="item.id">
         <div class="cell-header">{{ item.title }}</div>
         <div class="cell-content">
-          <span class="korean-text">{{ item.koreanText }}</span>
-          <span class="number">{{ item.number.toLocaleString() }}</span>
+          <span class="number">{{ item.number }}%</span>
         </div>
       </div>
     </div>
@@ -44,8 +43,7 @@
       <div class="cell" v-for="item in row5Data" :key="item.id">
         <div class="cell-header">{{ item.title }}</div>
         <div class="cell-content">
-          <span class="korean-text">{{ item.koreanText }}</span>
-          <span class="number">{{ item.number.toLocaleString() }}</span>
+          <span class="number">{{ item.number }}%</span>
         </div>
       </div>
     </div>
@@ -151,7 +149,7 @@ export default {
 }
 
 .cell-header {
-  font-size: 1.7rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #7f8c8d;
   margin-bottom: 10px;
