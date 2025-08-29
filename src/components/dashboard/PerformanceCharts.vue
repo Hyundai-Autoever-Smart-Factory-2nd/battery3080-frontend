@@ -109,7 +109,7 @@ export default {
   margin: 0 0 8px 0;
   text-align: center;
   color: #2c3e50;
-  font-size: 3rem;
+  font-size: 1.7rem;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -209,7 +209,7 @@ export default {
   padding: 12px 18px;
   background: white;
   border-radius: 8px;
-  font-size: 3rem;
+  font-size: 2.5rem;
   flex: 1;
   min-width: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -228,7 +228,7 @@ export default {
   font-weight: 600;
   margin-bottom: 0.5rem;
   white-space: nowrap;
-  font-size: 2rem;
+  font-size: 1.7rem;
 }
 
 .stat-item .value {
