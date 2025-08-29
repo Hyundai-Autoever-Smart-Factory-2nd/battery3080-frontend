@@ -1,10 +1,8 @@
-// API 설정 및 axios 인스턴스
-// 현재는 사용하지 않음, 나중에 백엔드 연동할 때 사용
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // 백엔드 서버 주소
-  timeout: 10000,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,9 +11,6 @@ const api = axios.create({
 // 요청 인터셉터 (필요시 토큰 추가 등)
 api.interceptors.request.use(
   (config) => {
-    // 필요시 JWT 토큰 추가
-    // const token = localStorage.getItem('token')
-    // if (token) config.headers.Authorization = `Bearer ${token}`
     console.log('API 요청:', config.method?.toUpperCase(), config.url)
     return config
   },

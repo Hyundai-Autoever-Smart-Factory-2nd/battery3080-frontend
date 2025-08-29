@@ -4,7 +4,7 @@
 
     <div class="table-row row-1">
       <div class="cell full-width">
-        <div class="cell-header">배터리 경고</div>
+        <div class="cell-header">전체 배터리 경고 수</div>
         <div class="cell-content">
           <span class="number">{{ totalProduction.toLocaleString() }}</span>
         </div>
@@ -25,7 +25,7 @@
       <div class="cell" v-for="item in row3Data" :key="item.id">
         <div class="cell-header">{{ item.title }}</div>
         <div class="cell-content">
-          <span class="number">{{ item.number.toLocaleString() }}</span>
+          <span class="number">{{ item.number }}%</span>
         </div>
       </div>
     </div>
@@ -34,8 +34,7 @@
       <div class="cell" v-for="item in row4Data" :key="item.id">
         <div class="cell-header">{{ item.title }}</div>
         <div class="cell-content">
-          <span class="korean-text">{{ item.koreanText }}</span>
-          <span class="number">{{ item.number.toLocaleString() }}</span>
+          <span class="number">{{ item.number }}%</span>
         </div>
       </div>
     </div>
@@ -44,8 +43,7 @@
       <div class="cell" v-for="item in row5Data" :key="item.id">
         <div class="cell-header">{{ item.title }}</div>
         <div class="cell-content">
-          <span class="korean-text">{{ item.koreanText }}</span>
-          <span class="number">{{ item.number.toLocaleString() }}</span>
+          <span class="number">{{ item.number }}%</span>
         </div>
       </div>
     </div>
@@ -94,11 +92,11 @@ export default {
 .data-table h2 {
   margin: 0 0 10px 0;
   color: #2c3e50;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 600;
   text-align: center;
   padding-bottom: 10px;
-  border-bottom: 2px solid #3498db;
+  border-bottom: 2px solid;
   flex-shrink: 0;
 }
 
@@ -151,7 +149,7 @@ export default {
 }
 
 .cell-header {
-  font-size: 0.9rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #7f8c8d;
   margin-bottom: 10px;
@@ -168,7 +166,7 @@ export default {
 }
 
 .korean-text {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #5d6d7e;
   font-weight: 500;
   text-align: center;
@@ -176,7 +174,7 @@ export default {
 }
 
 .number {
-  font-size: 1.4rem;
+  font-size: 3rem;
   font-weight: bold;
   color: #2c3e50;
   text-align: center;
